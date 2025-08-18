@@ -12,6 +12,7 @@ urlpatterns = [
     # path('distributions/<int:pk>/edit/', views.edit_distribution, name='edit_distribution'),
     # path('distributions/<int:pk>/delete/', views.delete_distribution, name='delete_distribution'),
     path('produce/', views.produce_list, name='produce_list'),
+    path('farmer-payments/<int:season_year>/', views.farmer_payments, name='farmer_payments'),
   #  path("add/", views.add_farmer, name="add_farmer"),
     path("summary/", views.summary, name="summary"),
 ]

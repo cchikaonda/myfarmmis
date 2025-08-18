@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Farmer Payments - {{ season_year }}{% endblock %}
+
+{% block content %}
+<div class="card p-4 shadow">
+    <h2>Farmer Payments for Season {{ season_year }}</h2>
+    <table class="table table-striped table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Farmer</th>
+                <th>Total Quantity (Kg)</th>
+                <th>Price per Kg (MK)</th>
+                <th>Total Payment (MK)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.farmer.name }}</td>
+                <td>{{ payment.total_kg|floatformat:2 }}</td>
+                <td>{{ payment.price_per_kg|floatformat:2 }}</td>
+                <td>{{ payment.total_value|floatformat:2 }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center">No payments found for this season.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="table-secondary">
+                <th>Grand Total</th>
+                <th>
+                    {{ payments|sum(attribute='total_kg')|floatformat:2 }}
+                </th>
+                <th></th>
+                <th>
+                    {{ payments|sum(attribute='total_value')|floatformat:2 }}
+                </th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}

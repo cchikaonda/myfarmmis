@@ -1,53 +1,74 @@
 from django import forms
-from .models import Farmer, ItemCategory, Item, FarmerCrop, Distribution, Produce, Crop
+from .models import (
+    Farmer,
+    InputCategory,
+    FarmInput,
+    FarmerCrop,
+    Distribution,
+    Produce,
+    Crop,
+    Season,
+    FarmerPayment
+)
 
 # Farmer form
 class FarmerForm(forms.ModelForm):
     class Meta:
         model = Farmer
-        fields = ['name', 'phone', 'village']
+        fields = '__all__'
 
 
-# ItemCategory form
-class ItemCategoryForm(forms.ModelForm):
+# Input Category form
+class InputCategoryForm(forms.ModelForm):
     class Meta:
-        model = ItemCategory
-        fields = ['name', 'description']
+        model = InputCategory
+        fields = '__all__'
 
 
-# Item form
-class ItemForm(forms.ModelForm):
+# Farm Input form
+class FarmInputForm(forms.ModelForm):
     class Meta:
-        model = Item
-        fields = ['category', 'name', 'unit', 'market_cost']
+        model = FarmInput
+        fields = '__all__'
 
 
-# FarmerCrop form (assign crop to farmer with acres)
+# Crop form
+class CropForm(forms.ModelForm):
+    class Meta:
+        model = Crop
+        fields = '__all__'
+
+
+# FarmerCrop form (linking farmer to crops)
 class FarmerCropForm(forms.ModelForm):
     class Meta:
         model = FarmerCrop
-        fields = ['farmer', 'crop', 'acres']
+        fields = '__all__'
 
 
-# Distribution form (inputs given to farmer per crop)
+# Distribution form
 class DistributionForm(forms.ModelForm):
     class Meta:
         model = Distribution
-        fields = ['farmer_crop', 'input_item', 'quantity', 'billed']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Optional: order by farmer name in dropdown
-        self.fields['farmer_crop'].queryset = FarmerCrop.objects.select_related('farmer', 'crop').all().order_by('farmer__name')
+        fields = '__all__'
 
 
-# Produce form (record yield per farmer-crop)
+# Produce form
 class ProduceForm(forms.ModelForm):
     class Meta:
         model = Produce
-        fields = ['farmer_crop', 'quantity', 'unit']
+        fields = '__all__'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Optional: order farmer_crop choices by farmer name
-        self.fields['farmer_crop'].queryset = FarmerCrop.objects.select_related('farmer', 'crop').all().order_by('farmer__name')
+
+# Season form
+class SeasonForm(forms.ModelForm):
+    class Meta:
+        model = Season
+        fields = '__all__'
+
+
+# Farmer Payment form
+class FarmerPaymentForm(forms.ModelForm):
+    class Meta:
+        model = FarmerPayment
+        fields = '__all__'

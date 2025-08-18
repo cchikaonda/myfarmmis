@@ -40,44 +40,51 @@
 
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    
                     <!-- Farmers -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="farmersDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-farmer"></i> Farmers
+                            <i class="fas fa-users"></i> Farmers
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="farmersDropdown">
                             <li><a class="dropdown-item" href="{% url 'farmer_list' %}"><i class="fas fa-list"></i> View All</a></li>
-                            <li><a class="dropdown-item" href="{% url 'farmer_create' %}"><i class="fas fa-plus-circle"></i> Add New</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-plus-circle"></i> Add New</a></li>
                         </ul>
                     </li>
 
                     <li class="nav-item divider"></li>
 
-                    <!-- Items & Categories -->
+                    <!-- Seasons -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-calendar-alt"></i> Seasons</a>
+                    </li>
+
+                    <li class="nav-item divider"></li>
+
+                    <!-- Farm Inputs -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="itemsDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-boxes"></i> Items & Categories
+                        <a class="nav-link dropdown-toggle" href="#" id="inputsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-seedling"></i> Farm Inputs
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="itemsDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="inputsDropdown">
                             <li><a class="dropdown-item" href="#"><i class="fas fa-tags"></i> Categories</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-box"></i> Items</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-plus-circle"></i> Add Item</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding"></i> Distribute Inputs</a></li>
                         </ul>
                     </li>
 
                     <li class="nav-item divider"></li>
 
-                    <!-- Distributions -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="distributionDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-truck-loading"></i> Distributions
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="distributionDropdown">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-list"></i> All Distributions</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding"></i> Distribute Items</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-receipt"></i> Billed Summary</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-money-bill-wave"></i> Not Billed Summary</a></li>
-                        </ul>
+                    <!-- Produce -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'produce_list' %}"><i class="fas fa-leaf"></i> Produce</a>
+                    </li>
+
+                    <li class="nav-item divider"></li>
+
+                    <!-- Loans / Advances -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-money-bill-wave"></i> Loans / Advances</a>
                     </li>
 
                     <li class="nav-item divider"></li>
@@ -92,14 +99,29 @@
                             <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice-dollar"></i> Financial Report</a></li>
                         </ul>
                     </li>
-                    <!-- Distributions / Produce -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'produce_list' %}">
-                            🌾 Produce
+                    <li>
+                    <li class="nav-item divider"></li>
+                    <!-- Season Filter Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="seasonDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-calendar-alt"></i> Season
                         </a>
+                        <ul class="dropdown-menu p-3" aria-labelledby="seasonDropdown">
+                            <form method="get" action="" class="px-2">
+                                <label for="seasonSelect" class="form-label">Select Season</label>
+                                <select name="season" id="seasonSelect" class="form-select" onchange="this.form.submit()">
+                                    <option value="">All</option>
+                                    {% for season in seasons %}
+                                    <option value="{{ season.id }}" {% if selected_season == season.id %}selected{% endif %}>
+                                        {{ season.year }} - {{ season.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </ul>
                     </li>
-                </ul>
 
+                </ul>
                 <!-- Optional user/logout -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
