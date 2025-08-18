@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Farmer Form{% endblock %}
+
+{% block content %}
+<div class="card shadow p-4">
+    <h2 class="mb-4">Farmer Input Form</h2>
+
+    <form method="POST" action="{% url 'farmer_create' %}">
+        {% csrf_token %}
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Farmer Name</th>
+                        <th># of Acres</th>
+                        <th>Seed in Kgs</th>
+                        <th>Bags of Fertilizer</th>
+                        <th>Seed Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for farmer in farmers %}
+                    <tr>
+                        <td><input type="text" class="form-control" name="farmer_name_{{ forloop.counter }}" value="{{ farmer.name }}"></td>
+                        <td><input type="number" step="0.01" class="form-control" name="acres_{{ forloop.counter }}" value="{{ farmer.acres }}"></td>
+                        <td><input type="number" step="0.01" class="form-control" name="seed_kg_{{ forloop.counter }}" value="{{ farmer.seed_kg }}"></td>
+                        <td><input type="number" step="0.01" class="form-control" name="fertilizer_bags_{{ forloop.counter }}" value="{{ farmer.fertilizer_bags }}"></td>
+                        <td><input type="text" class="form-control" name="seed_type_{{ forloop.counter }}" value="{{ farmer.seed_type }}"></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">No farmers available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <a href="{% url 'farmer_list' %}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

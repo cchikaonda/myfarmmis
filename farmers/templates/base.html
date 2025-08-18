@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Farm MIS{% endblock %}</title>
+
+    <!-- Local Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/fontawesome-all.min.css' %}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <style>
+        /* Divider between navbar items */
+        .navbar-nav .divider {
+            position: relative;
+            margin: 0 0.8rem;
+        }
+        .navbar-nav .divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 1px;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">🌾 Farm MIS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <!-- Farmers -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="farmersDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-farmer"></i> Farmers
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="farmersDropdown">
+                            <li><a class="dropdown-item" href="{% url 'farmer_list' %}"><i class="fas fa-list"></i> View All</a></li>
+                            <li><a class="dropdown-item" href="{% url 'add_farmer' %}"><i class="fas fa-plus-circle"></i> Add New</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item divider"></li>
+
+                    <!-- Items & Categories -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="itemsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-boxes"></i> Items & Categories
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="itemsDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-tags"></i> Categories</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-box"></i> Items</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-plus-circle"></i> Add Item</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item divider"></li>
+
+                    <!-- Distributions -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="distributionDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-truck-loading"></i> Distributions
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="distributionDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-list"></i> All Distributions</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding"></i> Distribute Items</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-receipt"></i> Billed Summary</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-money-bill-wave"></i> Not Billed Summary</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item divider"></li>
+
+                    <!-- Reports -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-chart-line"></i> Reports
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-alt"></i> Farmers Summary</a></li>
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice-dollar"></i> Financial Report</a></li>
+                        </ul>
+                    </li>
+                    <!-- Distributions / Produce -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'produce_list' %}">
+                            🌾 Produce
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Optional user/logout -->
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main container -->
+    <div class="container mt-4">
+        {% if messages %}
+            <div class="mt-2">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Local Bootstrap JS -->
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>
