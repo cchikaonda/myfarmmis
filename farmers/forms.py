@@ -1,51 +1,53 @@
 from django import forms
-from .models import Farmer, ItemCategory, Item, Distribution, Produce, Crop
+from .models import Farmer, ItemCategory, Item, FarmerCrop, Distribution, Produce, Crop
 
-
+# Farmer form
 class FarmerForm(forms.ModelForm):
-    """Form for creating or updating farmers."""
     class Meta:
         model = Farmer
-        fields = "__all__"
+        fields = ['name', 'phone', 'village']
 
 
+# ItemCategory form
 class ItemCategoryForm(forms.ModelForm):
-    """Form for adding categories like Fertilizer, Seed, Food, Cash, Other."""
     class Meta:
         model = ItemCategory
-        fields = "__all__"
+        fields = ['name', 'description']
 
 
+# Item form
 class ItemForm(forms.ModelForm):
-    """Form for specific items like NPK, Urea, Hybrid Seed, Maize Bags, etc."""
     class Meta:
         model = Item
-        fields = "__all__"
+        fields = ['category', 'name', 'unit', 'market_cost']
 
 
+# FarmerCrop form (assign crop to farmer with acres)
+class FarmerCropForm(forms.ModelForm):
+    class Meta:
+        model = FarmerCrop
+        fields = ['farmer', 'crop', 'acres']
+
+
+# Distribution form (inputs given to farmer per crop)
 class DistributionForm(forms.ModelForm):
-    """Form to record distributions given to farmers (link farmer + item + qty + date + billed)."""
     class Meta:
         model = Distribution
-        fields = "__all__"
+        fields = ['farmer_crop', 'input_item', 'quantity', 'billed']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Optional: order by farmer name in dropdown
+        self.fields['farmer_crop'].queryset = FarmerCrop.objects.select_related('farmer', 'crop').all().order_by('farmer__name')
 
 
-class CropForm(forms.ModelForm):
-    """Form to manage crops for produce tracking."""
-    class Meta:
-        model = Crop
-        fields = "__all__"
-
-
+# Produce form (record yield per farmer-crop)
 class ProduceForm(forms.ModelForm):
-    """Form to record end-of-season produce for each farmer."""
     class Meta:
         model = Produce
-        fields = "__all__"
-        widgets = {
-            # Use the model field's choices instead of accessing a class attribute directly
-            'unit': forms.Select(choices=Produce._meta.get_field('unit').choices),
-        }
-        help_texts = {
-            'quantity': 'Enter quantity in the specified unit (e.g., Kg, 50 Kg Bag, 60 Kg Bag)',
-        }
+        fields = ['farmer_crop', 'quantity', 'unit']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Optional: order farmer_crop choices by farmer name
+        self.fields['farmer_crop'].queryset = FarmerCrop.objects.select_related('farmer', 'crop').all().order_by('farmer__name')

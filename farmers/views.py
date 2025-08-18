@@ -1,58 +1,77 @@
-from django.shortcuts import render, redirect
-from .models import Farmer, ItemCategory, Item, Distribution, Produce
-from .forms import FarmerForm, ItemCategoryForm, ItemForm, DistributionForm
-from django.db.models import Sum, F
-
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Farmer, Distribution
-from .forms import FarmerForm
+from .models import Farmer, ItemCategory, Item, Distribution, Produce, FarmerCrop
+from .forms import FarmerForm, ItemCategoryForm, ItemForm, DistributionForm
 from collections import defaultdict
 from decimal import Decimal
+from django.db.models import Sum, F
+from django.db.models import Prefetch
 
+from django.shortcuts import render
+from .models import Farmer
 
 def farmer_list(request):
-    farmers = Farmer.objects.all()
+    farmers = Farmer.objects.prefetch_related(
+        'farmercrop_set__distribution_set',
+        'farmercrop_set__crop'
+    )
+
     farmer_data = []
 
-    total_billed_all = 0
-    total_not_billed_all = 0
-
     for farmer in farmers:
-        billed_items = farmer.distribution_set.filter(billed=True)
-        not_billed_items = farmer.distribution_set.filter(billed=False)
+        billed_distributions = []
+        not_billed_distributions = []
 
-        billed_total = sum([d.total_cost() for d in billed_items])
-        not_billed_total = sum([d.total_cost() for d in not_billed_items])
-
-        total_billed_all += billed_total
-        total_not_billed_all += not_billed_total
+        # Loop through each FarmerCrop
+        for fc in farmer.farmercrop_set.all():
+            distributions = fc.distribution_set.select_related('input_item', 'input_item__category')
+            billed_distributions.extend([d for d in distributions if d.billed])
+            not_billed_distributions.extend([d for d in distributions if not d.billed])
 
         farmer_data.append({
-            "farmer": farmer,
-            "billed_items": billed_items,
-            "not_billed_items": not_billed_items,
-            "billed_total": billed_total,
-            "not_billed_total": not_billed_total,
+            'farmer': farmer,
+            'billed_distributions': billed_distributions,
+            'not_billed_distributions': not_billed_distributions,
         })
 
-    return render(request, "farmers/farmer_list.html", {
-        "farmer_data": farmer_data,
-        "total_billed_all": total_billed_all,
-        "total_not_billed_all": total_not_billed_all,
-    })
+    return render(request, 'farmers/farmer_list.html', {'farmer_data': farmer_data})
 
-# Add a new farmer
-def add_farmer(request):
-    if request.method == "POST":
+
+# Create a new farmer
+def farmer_create(request):
+    if request.method == 'POST':
         form = FarmerForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect("farmer_list")
+            return redirect('farmer_list')
     else:
         form = FarmerForm()
-    return render(request, "farmers/farmer_form.html", {"form": form})
+    return render(request, 'farmers/farmer_form.html', {'form': form, 'title': 'Add Farmer'})
 
-# Add a new distribution (seeds, fertilizer, food, cash)
+
+# Update an existing farmer
+def farmer_update(request, pk):
+    farmer = get_object_or_404(Farmer, pk=pk)
+    if request.method == 'POST':
+        form = FarmerForm(request.POST, instance=farmer)
+        if form.is_valid():
+            form.save()
+            return redirect('farmer_list')
+    else:
+        form = FarmerForm(instance=farmer)
+    return render(request, 'farmers/farmer_form.html', {'form': form, 'title': 'Edit Farmer'})
+
+
+# Delete a farmer
+def farmer_delete(request, pk):
+    farmer = get_object_or_404(Farmer, pk=pk)
+    if request.method == 'POST':
+        farmer.delete()
+        return redirect('farmer_list')
+    return render(request, 'farmers/farmer_confirm_delete.html', {'farmer': farmer})
+
+
+
+# Add a new distribution (per FarmerCrop)
 def add_distribution(request):
     if request.method == "POST":
         form = DistributionForm(request.POST)
@@ -65,15 +84,21 @@ def add_distribution(request):
 
 # List all distributions
 def distribution_list(request):
-    distributions = Distribution.objects.select_related("farmer", "input_item", "input_item__category").all()
+    distributions = Distribution.objects.select_related(
+        "farmer_crop", "farmer_crop__farmer", "farmer_crop__crop", "input_item", "input_item__category"
+    ).all()
     return render(request, "farmers/distribution_list.html", {"distributions": distributions})
 
 # Summary report
 def summary(request):
     farmers = Farmer.objects.all()
-    distributions = Distribution.objects.select_related("farmer", "input_item", "input_item__category").all()
+    distributions = Distribution.objects.select_related(
+        "farmer_crop", "farmer_crop__farmer", "farmer_crop__crop", "input_item", "input_item__category"
+    ).all()
 
-    total_acres = farmers.aggregate(total_acres=Sum("acres"))["total_acres"] or 0
+    # Sum acres via FarmerCrop
+    total_acres = FarmerCrop.objects.aggregate(total_acres=Sum("acres"))["total_acres"] or 0
+
     total_distributions = distributions.aggregate(
         total_quantity=Sum("quantity"),
         total_cost=Sum(F("quantity") * F("input_item__market_cost"))
@@ -88,12 +113,15 @@ def summary(request):
     }
     return render(request, "farmers/summary.html", context)
 
+# List all produce
 def produce_list(request):
     """
     Display all end-of-season produce per farmer, grouped by crop,
     with unit conversions and grand totals.
     """
-    produces = Produce.objects.select_related("farmer", "crop").all().order_by("farmer__name")
+    produces = Produce.objects.select_related(
+        "farmer_crop", "farmer_crop__farmer", "farmer_crop__crop"
+    ).all().order_by("farmer_crop__farmer__name")
 
     farmer_totals = {}
     grand_totals = defaultdict(lambda: Decimal("0"))
@@ -102,15 +130,15 @@ def produce_list(request):
     special_crops = ["Maize", "Groundnuts"]
 
     for produce in produces:
-        farmer_id = produce.farmer.id
-        crop_name = produce.crop.name
+        farmer_id = produce.farmer_crop.farmer.id
+        crop_name = produce.farmer_crop.crop.name
         kg = produce.quantity_in_kg()        # Decimal
         unit_display = produce.get_unit_display()
 
         # Initialize farmer entry
         if farmer_id not in farmer_totals:
             farmer_totals[farmer_id] = {
-                "farmer": produce.farmer,
+                "farmer": produce.farmer_crop.farmer,
                 "crop_totals": {}
             }
 
@@ -138,3 +166,4 @@ def produce_list(request):
         "special_crops": special_crops
     }
     return render(request, "farmers/produce_list.html", context)
+
