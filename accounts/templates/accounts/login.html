@@ -1,0 +1,26 @@
+{% extends "base_auth.html" %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow p-4" style="width: 400px;">
+        <h2 class="mb-4 text-center">MyFarm Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+                <button type="submit" class="btn btn-success">🔑 Login</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

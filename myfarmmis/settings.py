@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
 
     'django.contrib.humanize', # For human-readable formatting
+    'accounts',
     'farmers',  # Custom app for farmers
 ]
 
