@@ -13,9 +13,6 @@ from .forms import (
     DistributionForm, CropForm, FarmerCropForm
 )
 
-
-
-
 def dashboard(request):
     show_welcome = request.session.pop("show_welcome", False)  # removes after use
     
@@ -28,7 +25,6 @@ def dashboard(request):
     }
     
     return render(request, "dashboard.html", context)
-
 
 # ------------------------
 # Season Views

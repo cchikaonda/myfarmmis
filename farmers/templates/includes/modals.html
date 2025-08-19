@@ -1,0 +1,90 @@
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow rounded-3">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title w-100 text-center" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center fs-5">
+                    <p>
+                        ⚠️ Are you sure you want to delete <strong id="itemName"></strong>? This action cannot be undone.
+                    </p>
+                </div>
+                <div class="modal-footer justify-content-center border-0">
+                    <button type="button" class="btn btn-secondary px-4 py-2 rounded" data-bs-dismiss="modal">
+                        ❌ Cancel
+                    </button>
+                    <form method="post" id="deleteForm" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger px-4 py-2 rounded">
+                            🗑️ Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End of Delete Confirmation Modal -->
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow p-4 rounded-2xl" style="max-width: 400px; margin: auto;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title text-center w-100" id="logoutModalLabel">Confirm Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p>Are you sure you want to log out?</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0">
+                    <button type="button" class="btn btn-secondary me-2 px-4 py-2 rounded-lg" data-bs-dismiss="modal">
+                        ❌ Cancel
+                    </button>
+                    <form method="post" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger px-4 py-2 rounded-lg">
+                            🔒 Logout
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if show_welcome %}
+    <!-- Welcome Modal -->
+    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- increased width -->
+            <div class="modal-content rounded-4 shadow">
+            
+            <div class="modal-header bg-success text-white rounded-top-4">
+                <h5 class="modal-title fs-3" id="welcomeModalLabel">👋 Welcome, {{ user.username|title }}!</h5> <!-- bigger title -->
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body text-center">
+                <p class="text-muted fs-5"> <!-- bigger body text -->
+                This is your farm management dashboard.<br>
+                Use the menu to navigate through different modules.
+                </p>
+            </div>
+
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal">Got it</button>
+            </div>
+
+            </div>
+        </div>
+    </div>
+
+    {% endif %}
+
+    <!-- Script to auto-show modal on page load -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
+        welcomeModal.show();
+    });
+    </script>
+    <!-- End of Welcome Modal -->

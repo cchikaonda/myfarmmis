@@ -21,7 +21,7 @@
             <tbody>
                 {% for farmer in farmers %}
                 <tr>
-                    <td>{{ farmer.id }}</td>
+                    <td>{{ forloop.counter }}</td>  <!-- This is the counter -->
                     <td>{{ farmer.name }}</td>
                     <td>{{ farmer.phone }}</td>
                     <td>{{ farmer.village }}</td>

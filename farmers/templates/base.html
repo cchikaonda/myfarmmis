@@ -26,14 +26,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <!-- Farmers Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="farmersDropdown" role="button" data-bs-toggle="dropdown">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'farmer_list' %}" role="button">
                             <i class="fas fa-users"></i> Farmers
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="farmersDropdown">
-                            <li><a class="dropdown-item" href="{% url 'farmer_list' %}"><i class="fas fa-list"></i> View All</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-plus-circle"></i> Add New</a></li>
-                        </ul>
                     </li>
                     <li class="nav-item divider"></li>
 
@@ -49,8 +45,8 @@
                             <i class="fas fa-seedling"></i> Farm Inputs
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="inputsDropdown">
-                            <li><a class="dropdown-item" href="{% url 'inputcategory_list' %}"><i class="fas fa-tags"></i> Categories</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-box"></i> Items</a></li>
+                            <li><a class="dropdown-item" href="{% url 'inputcategory_list' %}"><i class="fas fa-tags"></i>Farm Input Categories</a></li>
+                            <li><a class="dropdown-item" href="{% url 'farminput_list' %}"><i class="fas fa-box"></i> Farm Inputs</a></li>
                             <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding"></i> Distribute Inputs</a></li>
                         </ul>
                     </li>
@@ -98,99 +94,8 @@
         {% endblock %}
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow p-4 rounded-2xl" style="max-width: 400px; margin: auto;">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title text-center w-100" id="deleteModalLabel">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p>
-                        ⚠️ Are you sure you want to delete <strong id="itemName"></strong>? 
-                        This action cannot be undone.
-                    </p>
-                </div>
-                <div class="modal-footer justify-content-center border-0">
-                    <button type="button" class="btn btn-secondary me-2 px-4 py-2 rounded-lg" data-bs-dismiss="modal">
-                        ❌ Cancel
-                    </button>
-                    <form method="post" id="deleteForm" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger px-4 py-2 rounded-lg">
-                            🗑️ Delete
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-        <!-- Logout Confirmation Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content shadow p-4 rounded-2xl" style="max-width: 400px; margin: auto;">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title text-center w-100" id="logoutModalLabel">Confirm Logout</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <p>Are you sure you want to log out?</p>
-                </div>
-                <div class="modal-footer justify-content-center border-0">
-                    <button type="button" class="btn btn-secondary me-2 px-4 py-2 rounded-lg" data-bs-dismiss="modal">
-                        ❌ Cancel
-                    </button>
-                    <form method="post" action="{% url 'logout' %}" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger px-4 py-2 rounded-lg">
-                            🔒 Logout
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {% if show_welcome %}
-    <!-- Welcome Modal -->
-    <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="welcomeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg"> <!-- increased width -->
-        <div class="modal-content rounded-4 shadow">
-        
-        <div class="modal-header bg-success text-white rounded-top-4">
-            <h5 class="modal-title fs-3" id="welcomeModalLabel">👋 Welcome, {{ user.username|title }}!</h5> <!-- bigger title -->
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-
-        <div class="modal-body text-center">
-            <p class="text-muted fs-5"> <!-- bigger body text -->
-            This is your farm management dashboard.<br>
-            Use the menu to navigate through different modules.
-            </p>
-        </div>
-
-        <div class="modal-footer justify-content-center">
-            <button type="button" class="btn btn-primary btn-lg" data-bs-dismiss="modal">Got it</button>
-        </div>
-
-        </div>
-    </div>
-    </div>
-
-    {% endif %}
-
-<!-- Script to auto-show modal on page load -->
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    var welcomeModal = new bootstrap.Modal(document.getElementById('welcomeModal'));
-    welcomeModal.show();
-  });
-</script>
-
-
-
+    <!-- Include Delete Modal -->
+    {% include "includes/modals.html" %}      
     <!-- Scripts -->
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <!-- Custom JS -->
@@ -199,17 +104,25 @@
     <script src="{% static 'js/sweetalert2.min.js' %}"></script>
     {% if messages %}
     <script>
-        {% for message in messages %}
-            Swal.fire({
-                title: "{{ message.tags|capfirst }}",
-                text: "{{ message|escapejs }}",
-                icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}info{% endif %}",
-                confirmButtonText: "OK",
-                timer: 2000,
-                timerProgressBar: true
-            });
-        {% endfor %}
+    {% for message in messages %}
+        Swal.fire({
+            title: "{{ message.tags|capfirst }}",
+            text: "{{ message|escapejs }}",
+            icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}info{% endif %}",
+            showConfirmButton: false,       // removes the OK button
+            width: 800,                      // makes the modal wider
+            padding: '1.5rem',               // reduces padding for shorter height
+            timer: 2000,
+            timerProgressBar: true,
+            customClass: {
+                title: 'fs-3',               // larger title
+                content: 'fs-5'              // larger text
+            },
+            heightAuto: false                 // prevents automatic height expansion
+        });
+    {% endfor %}
     </script>
+
     {% endif %}
 </body>
 </html>
