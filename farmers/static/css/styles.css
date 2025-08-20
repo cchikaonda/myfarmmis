@@ -101,3 +101,8 @@ html, body {
   background-color: #9CCC65;
   border-color: #7CB342;
 }
+
+/* tables.css or your main CSS */
+.datatable {
+    visibility: hidden; /* hide table initially */
+}
