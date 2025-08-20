@@ -10,14 +10,30 @@
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{% static 'css/fontawesome-all.min.css' %}">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="{% static 'css/datatables.min.css' %}">
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="{% static 'css/sweetalert2.min.css' %}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="{% static 'css/buttons.bootstrap5.min.css' %}">
+
+    <style>
+        html, body { height: 100%; }
+        body { display: flex; flex-direction: column; }
+        main { flex: 1; /* push footer down */ }
+        footer {
+            background: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'dashboard' %}">🌾 MyFarm MIS</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -25,63 +41,29 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <!-- Farmers Dropdown -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'farmer_list' %}" role="button">
-                            <i class="fas fa-users"></i> Farmers
-                        </a>
-                    </li>
-                    <li class="nav-item divider"></li>
-
-                    <!-- Seasons -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'season_list' %}"><i class="fas fa-calendar-alt"></i> Seasons</a>
-                    </li>
-                    <li class="nav-item divider"></li>
-
-                    <!-- Farm Inputs -->
+                    <li class="nav-item"><a class="nav-link" href="{% url 'farmer_list' %}">🧑‍🌾 Farmers</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'season_list' %}">📅 Seasons</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="inputsDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-seedling"></i> Farm Inputs
-                        </a>
+                        <a class="nav-link dropdown-toggle" href="#" id="inputsDropdown" data-bs-toggle="dropdown">🌱 Farm Inputs</a>
                         <ul class="dropdown-menu" aria-labelledby="inputsDropdown">
-                            <li><a class="dropdown-item" href="{% url 'inputcategory_list' %}"><i class="fas fa-tags"></i>Farm Input Categories</a></li>
-                            <li><a class="dropdown-item" href="{% url 'farminput_list' %}"><i class="fas fa-box"></i> Farm Inputs</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-hand-holding"></i> Distribute Inputs</a></li>
+                            <li><a class="dropdown-item" href="{% url 'inputcategory_list' %}">🏷️ Input Categories</a></li>
+                            <li><a class="dropdown-item" href="{% url 'farminput_list' %}">📦 Farm Inputs</a></li>
+                            <li><a class="dropdown-item" href="#">🚚 Distribute Inputs</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item divider"></li>
-
-                    <!-- Produce -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'produce_list' %}"><i class="fas fa-leaf"></i> Produce</a>
-                    </li>
-                    <li class="nav-item divider"></li>
-
-                    <!-- Loans / Advances -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-money-bill-wave"></i> Loans / Advances</a>
-                    </li>
-                    <li class="nav-item divider"></li>
-
-                    <!-- Reports -->
+                    <li class="nav-item"><a class="nav-link" href="{% url 'produce_list' %}">🍃 Produce</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">💰 Loans / Advances</a></li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-chart-line"></i> Reports
-                        </a>
+                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" data-bs-toggle="dropdown">📊 Reports</a>
                         <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-alt"></i> Farmers Summary</a></li>
-                            <li><a class="dropdown-item" href="#"><i class="fas fa-file-invoice-dollar"></i> Financial Report</a></li>
+                            <li><a class="dropdown-item" href="#">📝 Farmers Summary</a></li>
+                            <li><a class="dropdown-item" href="#">💵 Financial Report</a></li>
                         </ul>
                     </li>
                 </ul>
-
-                <!-- Optional user/logout -->
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <button type="button" class="btn btn-link nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
+                        <button type="button" class="btn btn-link nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal">🔒 Logout</button>
                     </li>
                 </ul>
             </div>
@@ -89,40 +71,51 @@
     </nav>
 
     <!-- Main container -->
-    <div class="container mt-4">
-        {% block content %}
-        {% endblock %}
-    </div>
+    <main class="container mt-4">
+        {% include "includes/breadcrumbs.html" %}
+        {% block content %}{% endblock %}
+    </main>
 
-    <!-- Include Delete Modal -->
-    {% include "includes/modals.html" %}      
-    <!-- Scripts -->
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-    <!-- Custom JS -->
-    <script src="{% static 'js/scripts.js' %}"></script>
-    <!-- SweetAlert2 JS -->
-    <script src="{% static 'js/sweetalert2.min.js' %}"></script>
+    <!-- Footer -->
+    <footer>
+        <div class="footer">
+            <small>&copy; {{ now|date:"Y" }} Epsilon Computech. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    {% include "includes/modals.html" %}
+
+    {% include "includes/javascript.html"%}
+
+    <!-- SweetAlert2 Messages -->
     {% if messages %}
     <script>
-    {% for message in messages %}
+    $(document).ready(function() {
+        {% for message in messages %}
         Swal.fire({
             title: "{{ message.tags|capfirst }}",
             text: "{{ message|escapejs }}",
             icon: "{% if 'success' in message.tags %}success{% elif 'error' in message.tags %}error{% elif 'warning' in message.tags %}warning{% else %}info{% endif %}",
-            showConfirmButton: false,       // removes the OK button
-            width: 800,                      // makes the modal wider
-            padding: '1.5rem',               // reduces padding for shorter height
+            showConfirmButton: false,
             timer: 2000,
             timerProgressBar: true,
+            width: 600,
+            padding: '1.5rem',
+            heightAuto: false,
+            backdrop: true,
+            allowOutsideClick: false,
+            toast: false,
+            position: 'center',
+            zIndex: 9999,
             customClass: {
-                title: 'fs-3',               // larger title
-                content: 'fs-5'              // larger text
-            },
-            heightAuto: false                 // prevents automatic height expansion
+                title: 'fs-3',
+                content: 'fs-5'
+            }
         });
-    {% endfor %}
+        {% endfor %}
+    });
     </script>
-
     {% endif %}
 </body>
 </html>

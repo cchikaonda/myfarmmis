@@ -2,63 +2,255 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
 
-    <!-- Welcome Banner -->
-    <!-- <div class="card shadow p-4 mb-4 text-center bg-light rounded-3">
-        <h2 class="mb-2">👋 Welcome, {{ user.username|title }}!</h2>
-        <p class="text-muted">This is your farm management dashboard. Use the menu to navigate through different modules.</p>
-    </div> -->
+<!-- Dashboard Tabs -->
+<ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="graphs-tab" data-bs-toggle="tab" data-bs-target="#graphs" type="button" role="tab">
+            📊 Graphs
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="farm-tab" data-bs-toggle="tab" data-bs-target="#farm" type="button" role="tab">
+            🧑‍🌾 Farmers & Production
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="finance-tab" data-bs-toggle="tab" data-bs-target="#finance" type="button" role="tab">
+            💵 Finance
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="admin-tab" data-bs-toggle="tab" data-bs-target="#admin" type="button" role="tab">
+            ⚙️ Admin
+        </button>
+    </li>
+</ul>
 
-    <!-- Dashboard Cards -->
-    <div class="row g-4">
-        <!-- Farmers -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+<div class="tab-content mt-3">
+    <!-- Graphs tab -->
+    <div class="tab-pane fade show active" id="graphs" role="tabpanel">
+        <div class="card shadow p-3 rounded-3">
+            <h5>📊 Analytics & Graphs</h5>
+            <p class="text-muted">Visual insights such as farmer distribution, payments, and production trends.</p>
+
+            <!-- Charts Grid -->
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <canvas id="farmerChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="productionChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="paymentsChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="inputDistributionChart"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <canvas id="rationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Farmers & Production -->
+    <div class="tab-pane fade" id="farm" role="tabpanel">
+        <div class="d-flex flex-wrap gap-3">
+            <div class="card shadow-sm text-center p-3" style="width:200px;">
                 <h5>👨‍🌾 Farmers</h5>
                 <h2 class="text-success">{{ farmer_count }}</h2>
-                <a href="{% url 'farmer_list' %}" class="btn btn-outline-success btn-sm mt-2">View</a>
+                <a href="{% url 'farmer_list' %}" class="btn btn-outline-success btn-sm">View</a>
             </div>
-        </div>
-
-        <!-- Inputs -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+            <div class="card shadow-sm text-center p-3" style="width:200px;">
                 <h5>🌱 Inputs</h5>
                 <h2 class="text-primary">{{ input_count }}</h2>
-                <a href="{% url 'farminput_list' %}" class="btn btn-outline-primary btn-sm mt-2">View</a>
+                <a href="{% url 'farminput_list' %}" class="btn btn-outline-primary btn-sm">View</a>
             </div>
-        </div>
-
-        <!-- Distributions -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+            <div class="card shadow-sm text-center p-3" style="width:200px;">
                 <h5>🚚 Distributions</h5>
                 <h2 class="text-warning">{{ distribution_count }}</h2>
-                <a href="#" class="btn btn-outline-warning btn-sm mt-2">View</a>
+                <a href="#" class="btn btn-outline-warning btn-sm">View</a>
+            </div>
+            <div class="card shadow-sm text-center p-3" style="width:200px;">
+                <h5>🍽️ Ration</h5>
+                <h2 class="text-info">⚙️</h2>
+                <a href="#" class="btn btn-outline-info btn-sm">Formulate</a>
             </div>
         </div>
+    </div>
 
-        <!-- Payments -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 rounded-3 text-center p-3">
+    <!-- Finance -->
+    <div class="tab-pane fade" id="finance" role="tabpanel">
+        <div class="d-flex flex-wrap gap-3">
+            <div class="card shadow-sm text-center p-3" style="width:200px;">
                 <h5>💵 Payments</h5>
                 <h2 class="text-danger">{{ payment_count }}</h2>
-                <a href="#" class="btn btn-outline-danger btn-sm mt-2">View</a>
+                <a href="#" class="btn btn-outline-danger btn-sm">View</a>
+            </div>
+            <div class="card shadow-sm text-center p-3" style="width:200px;">
+                <h5>📦 Inventory</h5>
+                <h2 class="text-secondary">—</h2>
+                <a href="#" class="btn btn-outline-secondary btn-sm">Manage</a>
             </div>
         </div>
     </div>
 
-    <!-- Quick Links -->
-    <div class="card shadow mt-4 p-4 rounded-3">
-        <h4 class="mb-3">⚡ Quick Actions</h4>
-        <div class="d-flex flex-wrap gap-3">
-            <a href="{% url 'farmer_create' %}" class="btn btn-success">➕ Add Farmer</a>
-            <a href="{% url 'season_create' %}" class="btn btn-primary">📅 Add Season</a>
-            <a href="#" class="btn btn-warning">🚚 New Distribution</a>
-            <a href="#" class="btn btn-danger">💵 Record Payment</a>
+    <!-- Admin -->
+    <!-- Admin Tab -->
+<div class="tab-pane fade" id="admin" role="tabpanel">
+    <div class="d-flex flex-wrap gap-3">
+
+        <!-- Seasons -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>📅 Seasons</h5>
+            <h2 class="text-primary">{{ season_count|default:"—" }}</h2>
+            <a href="{% url 'season_list' %}" class="btn btn-outline-primary btn-sm">Manage</a>
         </div>
+
+        <!-- Staff -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>👥 Staff</h5>
+            <h2 class="text-dark">{{ staff_count|default:"—" }}</h2>
+            <a href="#" class="btn btn-outline-dark btn-sm">Manage</a>
+        </div>
+
+        <!-- Farmers -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>🧑‍🌾 Farmers</h5>
+            <h2 class="text-success">{{ farmer_count|default:"—" }}</h2>
+            <a href="{% url 'farmer_list' %}" class="btn btn-outline-success btn-sm">Manage</a>
+        </div>
+
+        <!-- Farm Inputs -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>🌱 Inputs</h5>
+            <h2 class="text-info">{{ input_count|default:"—" }}</h2>
+            <a href="{% url 'farminput_list' %}" class="btn btn-outline-info btn-sm">Manage</a>
+        </div>
+
+        <!-- Loans / Advances -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>💵 Loans</h5>
+            <h2 class="text-warning">{{ loan_count|default:"—" }}</h2>
+            <a href="#" class="btn btn-outline-warning btn-sm">Manage</a>
+        </div>
+
+        <!-- Produce -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>🍃 Produce</h5>
+            <h2 class="text-success">{{ produce_count|default:"—" }}</h2>
+            <a href="{% url 'produce_list' %}" class="btn btn-outline-success btn-sm">Manage</a>
+        </div>
+
+        <!-- Reports -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>📊 Reports</h5>
+            <h2 class="text-info">📈</h2>
+            <a href="#" class="btn btn-outline-info btn-sm">View</a>
+        </div>
+
+        <!-- Settings -->
+        <div class="card shadow-sm text-center p-3" style="width:200px;">
+            <h5>⚙️ Settings</h5>
+            <h2 class="text-secondary">🔧</h2>
+            <a href="#" class="btn btn-outline-secondary btn-sm">Configure</a>
+        </div>
+
     </div>
+</div>
 
 </div>
+
+<!-- Charts JS -->
+<script src="{% static 'js/chart.min.js' %}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Farmer chart
+    new Chart(document.getElementById('farmerChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Farmers'],
+            datasets: [{
+                label: 'Total Farmers',
+                data: [{{ farmer_count|default:0 }}],
+                backgroundColor: 'rgba(40, 167, 69, 0.6)',
+                borderColor: 'rgba(40, 167, 69, 1)',
+                borderWidth: 1
+            }]
+        }
+    });
+
+    // Production chart
+    new Chart(document.getElementById('productionChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+            datasets: [{
+                label: 'Production',
+                data: [5, 8, 6, 10],
+                backgroundColor: 'rgba(0, 123, 255, 0.3)',
+                borderColor: 'rgba(0, 123, 255, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        }
+    });
+
+    // Payments chart
+    new Chart(document.getElementById('paymentsChart'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr'],
+            datasets: [{
+                label: 'Payments',
+                data: [10, 15, 12, 20],
+                backgroundColor: 'rgba(220, 53, 69, 0.2)',
+                borderColor: 'rgba(220, 53, 69, 1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        }
+    });
+
+    // Inputs distribution
+    new Chart(document.getElementById('inputDistributionChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Fertilizer', 'Seeds', 'Pesticides'],
+            datasets: [{
+                label: 'Inputs Distribution',
+                data: [5, 3, 2],
+                backgroundColor: [
+                    'rgba(0, 123, 255, 0.6)',
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(255, 193, 7, 0.6)'
+                ]
+            }]
+        }
+    });
+
+    // Ration chart
+    new Chart(document.getElementById('rationChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Maize', 'Soy', 'Fishmeal', 'Minerals'],
+            datasets: [{
+                label: 'Ration Formulation',
+                data: [50, 20, 20, 10],
+                backgroundColor: [
+                    'rgba(255, 193, 7, 0.6)',
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(0, 123, 255, 0.6)',
+                    'rgba(220, 53, 69, 0.6)'
+                ]
+            }]
+        }
+    });
+});
+</script>
+
 {% endblock %}

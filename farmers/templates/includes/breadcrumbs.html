@@ -1,0 +1,24 @@
+<style>
+    .breadcrumb-item + .breadcrumb-item::before {
+    content: " > ";
+}
+</style>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    {% for crumb in breadcrumbs %}
+      {% if forloop.last %}
+        <li class="breadcrumb-item active text-decoration-none" aria-current="page">
+            <span role="img" aria-label="{{ crumb.name }}">{{ crumb.icon }}</span>
+          {% if crumb.icon %} {{ crumb.name }}{% endif %}
+        </li>
+      {% else %}
+        <li class="breadcrumb-item">
+        <span role="img" aria-label="{{ crumb.name }}">{{ crumb.icon }}</span>
+          <a href="{% url crumb.url %}" class="text-decoration-none">
+            {% if crumb.icon %} {{ crumb.name }} {% endif %}
+          </a>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ol>
+</nav>

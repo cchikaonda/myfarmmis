@@ -8,7 +8,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover datatable" data-title="Seasons">
             <thead class="table-light">
                 <tr>
                     <th>ID</th>
@@ -19,11 +19,11 @@
             <tbody>
                 {% for season in seasons %}
                 <tr>
-                   <td>{{ forloop.counter }}</td>  <!-- This is the counter -->
+                    <td>{{ forloop.counter }}</td>
                     <td>{{ season.year }}</td>
                     <td class="text-end">
                         <a href="{% url 'season_update' season.pk %}" class="btn btn-sm btn-warning me-1">✏️ Edit</a>
-                       <button 
+                        <button 
                             class="btn btn-sm btn-danger" 
                             data-bs-toggle="modal" 
                             data-bs-target="#deleteModal"
@@ -43,4 +43,5 @@
         </table>
     </div>
 </div>
+
 {% endblock %}
