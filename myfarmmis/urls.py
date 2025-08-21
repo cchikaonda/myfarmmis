@@ -10,4 +10,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('farmers.urls')),
     path('', include('accounts.urls')),
+    path('ration/', include('rationapp.urls')),
 ]

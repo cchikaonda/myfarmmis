@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Produce Details</h2>
+<ul class="list-group">
+    <li class="list-group-item"><strong>Farmer:</strong> {{ produce.farmer_crop.farmer.name }}</li>
+    <li class="list-group-item"><strong>Crop:</strong> {{ produce.farmer_crop.crop.name }}</li>
+    <li class="list-group-item"><strong>Quantity:</strong> {{ produce.quantity }} {{ produce.unit }}</li>
+    <li class="list-group-item"><strong>Season:</strong> {{ produce.season.year }}</li>
+    <li class="list-group-item"><strong>Date Recorded:</strong> {{ produce.date_recorded }}</li>
+    <li class="list-group-item"><strong>Quantity in KG:</strong> {{ produce.quantity_in_kg }}</li>
+</ul>
+<a href="{% url 'produce_edit' produce.pk %}" class="btn btn-warning mt-3">Edit</a>
+<a href="{% url 'produce_list' %}" class="btn btn-secondary mt-3">Back</a>
+{% endblock %}

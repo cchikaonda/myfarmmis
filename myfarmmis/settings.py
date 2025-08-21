@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize', # For human-readable formatting
     'accounts',
     'farmers',  # Custom app for farmers
+    'rationapp',  # Custom app for ration management
 ]
 
 MIDDLEWARE = [

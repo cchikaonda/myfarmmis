@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card shadow p-4 mt-4">
+    <h3 class="text-center mb-2">🐓 Poultry type selection</h3>
+    <p class="text-center text-muted mb-4">Choose the type of poultry to formulate rations</p>
+
+    <div class="d-flex justify-content-center flex-wrap gap-3">
+
+        <!-- Layers Card -->
+        <div class="card shadow-sm text-center p-3 hover-scale" style="width:200px;">
+            <h5 class="mb-1">🐔 Layers</h5>
+            <p class="text-muted small mb-2">For egg production</p>
+            <a href="#" class="btn btn-primary btn-sm mt-2 w-100">Select</a>
+            <a href="#" class="btn btn-outline-secondary btn-sm mt-1 w-100">View Saved</a>
+        </div>
+
+        <!-- Broilers Card -->
+        <div class="card shadow-sm text-center p-3 hover-scale" style="width:200px;">
+            <h5 class="mb-1">🍗 Broilers</h5>
+            <p class="text-muted small mb-2">For meat production</p>
+            <a href="#" class="btn btn-success btn-sm mt-2 w-100">Select</a>
+            <a href="#" class="btn btn-outline-secondary btn-sm mt-1 w-100">View Saved</a>
+        </div>
+
+        <!-- Breeders Card -->
+        <div class="card shadow-sm text-center p-3 hover-scale" style="width:200px;">
+            <h5 class="mb-1">🪶 Breeders</h5>
+            <p class="text-muted small mb-2">For reproduction & fertility</p>
+            <a href="#" class="btn btn-warning btn-sm mt-2 w-100">Select</a>
+            <a href="#" class="btn btn-outline-secondary btn-sm mt-1 w-100">View Saved</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Hover effect to scale cards */
+    .hover-scale:hover {
+        transform: scale(1.05);
+        transition: transform 0.3s ease-in-out;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    .card h1 {
+        font-size: 3rem;
+    }
+
+    @media (max-width: 576px) {
+        .card {
+            width: 100% !important;
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+{% endblock %}

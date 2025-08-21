@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Saved Rations</h2>
+
+{% if rations %}
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Animal</th>
+            <th>Feed Type</th>
+            <th>Total Feed (Kg)</th>
+            <th>Total Cost (MK)</th>
+            <th>Created At</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ration in rations %}
+        <tr>
+            <td>{{ ration.animal.name }}</td>
+            <td>{{ ration.feed_type.name }}</td>
+            <td>{{ ration.total_weight|floatformat:2 }}</td>
+            <td>{{ ration.total_cost|floatformat:2 }}</td>
+            <td>{{ ration.created_at|date:"Y-m-d H:i" }}</td>
+            <td><a href="{% url 'ration_detail' ration.id %}" class="btn btn-primary btn-sm">View</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No saved rations found.</p>
+{% endif %}
+
+{% endblock %}

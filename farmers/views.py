@@ -1,4 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from collections import defaultdict
+from decimal import Decimal
+from django.shortcuts import render
+from django.core.paginator import Paginator
+from .models import Produce, Season, Farmer, Crop
 from django.contrib import messages
 from django.db.models import Sum, F
 from collections import defaultdict
@@ -10,7 +15,7 @@ from .models import (
 )
 from .forms import (
     SeasonForm, FarmerForm, InputCategoryForm, FarmInputForm,
-    DistributionForm, CropForm, FarmerCropForm
+    DistributionForm, CropForm, FarmerCropForm, ProduceForm
 )
 
 # ------------------------
@@ -383,32 +388,85 @@ def add_distribution(request):
 # ------------------------
 # Produce Views
 # ------------------------
-def produce_list(request):
-    season_id = request.GET.get("season")
-    season = Season.objects.filter(id=season_id).first() if season_id else None
 
+# Add new produce
+def produce_create(request):
+    breadcrumbs = [
+        {'url': 'dashboard', 'name': 'Dashboard', 'icon': '🏠'},
+        {'url': 'produce_list', 'name': 'Produce', 'icon': '🌾'},
+        {'url': None, 'name': 'Add Produce', 'icon': '➕'},
+    ]
+
+    if request.method == 'POST':
+        form = ProduceForm(request.POST)
+        if form.is_valid():
+            produce = form.save()
+            crop_name = produce.farmer_crop.crop.name  # Get crop name from saved instance
+            messages.success(request, f"Produce for '{crop_name}' created successfully! ✅")
+            return redirect('produce_list')
+    else:
+        form = ProduceForm()
+
+    context = {
+        'form': form,
+        'breadcrumbs': breadcrumbs,
+        'title': 'Add New Produce',
+    }
+    return render(request, 'produce/produce_form.html', context)
+
+
+def produce_list(request):
+    # Get filter parameters
+    season_id = request.GET.get("season")
+    farmer_id = request.GET.get("farmer")
+    crop_id = request.GET.get("crop")
+    page_number = request.GET.get("page", 1)
+
+    # Fetch objects for filters
+    season = Season.objects.filter(id=season_id).first() if season_id else None
+    farmer_filter = Farmer.objects.filter(id=farmer_id).first() if farmer_id else None
+    crop_filter = Crop.objects.filter(id=crop_id).first() if crop_id else None
+
+    # Base queryset
     produces = Produce.objects.select_related(
         "farmer_crop", "farmer_crop__farmer", "farmer_crop__crop", "season"
     )
+
+    # Apply filters
     if season:
         produces = produces.filter(season=season)
+    if farmer_filter:
+        produces = produces.filter(farmer_crop__farmer=farmer_filter)
+    if crop_filter:
+        produces = produces.filter(farmer_crop__crop=crop_filter)
+
     produces = produces.order_by("farmer_crop__farmer__name")
 
+    # Pagination
+    paginator = Paginator(produces, 10)  # 10 records per page
+    page_obj = paginator.get_page(page_number)
+
+    # Aggregate totals (for the current filtered queryset)
     farmer_totals = {}
     grand_totals = defaultdict(lambda: Decimal("0"))
-    special_crops = ["Maize", "Groundnuts"]
 
     for produce in produces:
-        farmer_id = produce.farmer_crop.farmer.id
+        f_id = produce.farmer_crop.farmer.id
         crop_name = produce.farmer_crop.crop.name
         kg = produce.quantity_in_kg()
         unit_display = produce.get_unit_display()
 
-        if farmer_id not in farmer_totals:
-            farmer_totals[farmer_id] = {"farmer": produce.farmer_crop.farmer, "crop_totals": {}}
+        if f_id not in farmer_totals:
+            farmer_totals[f_id] = {
+                "farmer": produce.farmer_crop.farmer,
+                "crop_totals": {},
+                "total_kg": Decimal("0"),
+                "total_50kg": Decimal("0"),
+                "total_60kg": Decimal("0"),
+            }
 
-        if crop_name not in farmer_totals[farmer_id]["crop_totals"]:
-            farmer_totals[farmer_id]["crop_totals"][crop_name] = {
+        if crop_name not in farmer_totals[f_id]["crop_totals"]:
+            farmer_totals[f_id]["crop_totals"][crop_name] = {
                 "quantity": produce.quantity,
                 "unit_display": unit_display,
                 "total_kg": kg,
@@ -416,26 +474,71 @@ def produce_list(request):
                 "total_60kg": kg / Decimal("60"),
             }
         else:
-            farmer_totals[farmer_id]["crop_totals"][crop_name]["quantity"] += produce.quantity
-            farmer_totals[farmer_id]["crop_totals"][crop_name]["total_kg"] += kg
-            farmer_totals[farmer_id]["crop_totals"][crop_name]["total_50kg"] += kg / Decimal("50")
-            farmer_totals[farmer_id]["crop_totals"][crop_name]["total_60kg"] += kg / Decimal("60")
+            farmer_totals[f_id]["crop_totals"][crop_name]["quantity"] += produce.quantity
+            farmer_totals[f_id]["crop_totals"][crop_name]["total_kg"] += kg
+            farmer_totals[f_id]["crop_totals"][crop_name]["total_50kg"] += kg / Decimal("50")
+            farmer_totals[f_id]["crop_totals"][crop_name]["total_60kg"] += kg / Decimal("60")
 
-        grand_totals[crop_name] += kg
+        # Update per-farmer totals
+        farmer_totals[f_id]["total_kg"] += kg
+        farmer_totals[f_id]["total_50kg"] += kg / Decimal("50")
+        farmer_totals[f_id]["total_60kg"] += kg / Decimal("60")
 
+        # Update grand totals
+        grand_totals["total_kg"] += kg
+        grand_totals["total_50kg"] += kg / Decimal("50")
+        grand_totals["total_60kg"] += kg / Decimal("60")
+
+    # Breadcrumbs
     breadcrumbs = [
         {'url': 'dashboard', 'name': 'Dashboard', 'icon': '🏠'},
         {'url': None, 'name': 'Produce', 'icon': '📦'},
     ]
 
+    # All filters for dropdowns
+    all_farmers = Farmer.objects.all()
+    all_seasons = Season.objects.all()
+    all_crops = Crop.objects.all()
+
     context = {
         "farmer_totals": farmer_totals,
         "grand_totals": grand_totals,
-        "special_crops": special_crops,
         "season": season,
+        "farmers": all_farmers,
+        "seasons": all_seasons,
+        "crops": all_crops,
+        "selected_farmer": farmer_id,
+        "selected_season": season_id,
+        "selected_crop": crop_id,
         "breadcrumbs": breadcrumbs,
+        "page_obj": page_obj,  # for pagination
     }
-    return render(request, "farmers/produce_list.html", context)
+    return render(request, "produce/produce_list.html", context)
+
+# Edit produce
+def produce_edit(request, pk):
+    produce = get_object_or_404(Produce, pk=pk)
+    if request.method == 'POST':
+        form = ProduceForm(request.POST, instance=produce)
+        if form.is_valid():
+            form.save()
+            return redirect('produce_list')
+    else:
+        form = ProduceForm(instance=produce)
+    return render(request, 'produce/produce_form.html', {'form': form})
+
+# Delete produce
+def produce_delete(request, pk):
+    produce = get_object_or_404(Produce, pk=pk)
+    if request.method == 'POST':
+        produce.delete()
+        return redirect('produce_list')
+    return render(request, 'produce/produce_confirm_delete.html', {'object': produce})
+
+# View produce details
+def produce_detail(request, pk):
+    produce = get_object_or_404(Produce, pk=pk)
+    return render(request, 'produce/produce_detail.html', {'produce': produce})
 
 # ------------------------
 # Farmer Payments

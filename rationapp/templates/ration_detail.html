@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Ration for {{ ration.animal.name }} (Feed Type: {{ ration.feed_type.name }})</h2>
+<p><strong>Total Feed:</strong> {{ ration.total_weight|floatformat:2 }} Kg</p>
+<p><strong>Total Cost:</strong> MK {{ ration.total_cost|floatformat:2 }}</p>
+
+<h3>Ingredient Breakdown:</h3>
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Ingredient</th>
+            <th>Amount (Kg)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ing in ingredients %}
+        <tr>
+            <td>{{ ing.ingredient.name }}</td>
+            <td>{{ ing.amount_kg|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="mt-4">Total Nutritional Composition</h4>
+<table class="table table-bordered table-striped mt-2">
+    <thead class="table-light">
+        <tr>
+            <th>Nutrient</th>
+            <th>Amount</th>
+            <th>Unit</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for nutrient, value in total_nutrients_list %}
+        <tr>
+            <td>{{ nutrient|capfirst }}</td>
+            <td>{{ value|floatformat:2 }}</td>
+            <td>
+                {% if nutrient in "energy_kcal energy" %}
+                    Kcal
+                {% else %}
+                    g
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'saved_rations' %}" class="btn btn-secondary mt-3">Back to Saved Rations</a>
+{% endblock %}
